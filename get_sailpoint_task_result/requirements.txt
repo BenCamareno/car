@@ -1,0 +1,2 @@
+--index-url https://artifactory.internal.cba/artifactory/api/pypi/org.python.pypi/simple
+tenacity==8.2.3
