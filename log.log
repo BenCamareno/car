@@ -1,5 +1,5 @@
-E       AssertionError: Expected: {'url': 'https://test01.identity.test.aws.groupapi.cba/workforce-privileged-access-management/pam/request/452', 'gidp_token': 'test_token', 'method': 'GET', 'payload': '', 'client_public_cert_path': '/public_key.pem', 'client_private_key_content': 'private_key_content', 'ca_cert_path': '/ca_cert.pem', 'log_details': True}, but got: {'url': 'https://test01.identity.test.aws.groupapi.cba/workforce-privileged-access-management/pam/request/452/<function request_id at 0x106e6c400>', 'gidp_token': 'test_token', 'method': 'GET', 'payload': '', 'client_public_cert_path': '/public_key.pem', 'client_private_key_content': 'private_key_content', 'ca_cert_path': '/ca_cert.pem', 'log_details': <Mock name='mock.cyberark.log_api_call_details' id='4393967712'>}
-E       assert {'url': 'https://test01.identity.test.aws.groupapi.cba/workforce-privileged-access-management/pam/request/452', 'gidp_token': 'test_token', 'method': 'GET', 'payload': '', 'client_public_cert_path': '/public_key.pem', 'client_private_key_content': 'private_key_content', 'ca_cert_path': '/ca_cert.pem', 'log_details': True} == {'url': 'https://test01.identity.test.aws.groupapi.cba/workforce-privileged-access-management/pam/request/452/<function request_id at 0x106e6c400>', 'gidp_token': 'test_token', 'method': 'GET', 'payload': '', 'client_public_cert_path': '/public_key.pem', 'client_private_key_content': 'private_key_content', 'ca_cert_path': '/ca_cert.pem', 'log_details': <Mock name='mock.cyberark.log_api_call_details' id='4393967712'>}
+E       AssertionError: Expected: {'url': 'https://test01.identity.test.aws.groupapi.cba/workforce-privileged-access-management/pam/request/452', 'gidp_token': 'test_token', 'method': 'GET', 'payload': '', 'client_public_cert_path': '/public_key.pem', 'client_private_key_content': 'private_key_content', 'ca_cert_path': '/ca_cert.pem', 'log_details': True}, but got: {'url': 'https://test01.identity.test.aws.groupapi.cba/workforce-privileged-access-management/pam/request/452', 'gidp_token': 'test_token', 'method': 'GET', 'payload': '', 'client_public_cert_path': '/public_key.pem', 'client_private_key_content': 'private_key_content', 'ca_cert_path': '/ca_cert.pem', 'log_details': <Mock name='mock.cyberark.log_api_call_details' id='4328461984'>}
+E       assert {'url': 'https://test01.identity.test.aws.groupapi.cba/workforce-privileged-access-management/pam/request/452', 'gidp_token': 'test_token', 'method': 'GET', 'payload': '', 'client_public_cert_path': '/public_key.pem', 'client_private_key_content': 'private_key_content', 'ca_cert_path': '/ca_cert.pem', 'log_details': True} == {'url': 'https://test01.identity.test.aws.groupapi.cba/workforce-privileged-access-management/pam/request/452', 'gidp_token': 'test_token', 'method': 'GET', 'payload': '', 'client_public_cert_path': '/public_key.pem', 'client_private_key_content': 'private_key_content', 'ca_cert_path': '/ca_cert.pem', 'log_details': <Mock name='mock.cyberark.log_api_call_details' id='4328461984'>}
 E         
 E         Common items:
 E         {'ca_cert_path': '/ca_cert.pem',
@@ -7,10 +7,10 @@ E          'client_private_key_content': 'private_key_content',
 E          'client_public_cert_path': '/public_key.pem',
 E          'gidp_token': 'test_token',
 E          'method': 'GET',
-E          'payload': ''}
+E          'payload': '',
+E          'url': 'https://test01.identity.test.aws.groupapi.cba/workforce-privileged-access-management/pam/request/452'}
 E         Differing items:
-E         {'url': 'https://test01.identity.test.aws.groupapi.cba/workforce-privileged-access-management/pam/request/452'} != {'url': 'https://test01.identity.test.aws.groupapi.cba/workforce-privileged-access-management/pam/request/452/<function request_id at 0x106e6c400>'}
-E         {'log_details': True} != {'log_details': <Mock name='mock.cyberark.log_api_call_details' id='4393967712'>}
+E         {'log_details': True} != {'log_details': <Mock name='mock.cyberark.log_api_call_details' id='4328461984'>}
 E         
 E         Full diff:
 E           {
@@ -18,15 +18,11 @@ E               'ca_cert_path': '/ca_cert.pem',
 E               'client_private_key_content': 'private_key_content',
 E               'client_public_cert_path': '/public_key.pem',
 E               'gidp_token': 'test_token',
-E         -     'log_details': <Mock name='mock.cyberark.log_api_call_details' id='4393967712'>,
+E         -     'log_details': <Mock name='mock.cyberark.log_api_call_details' id='4328461984'>,
 E         +     'log_details': True,
 E               'method': 'GET',
 E               'payload': '',
-E         -     'url': 'https://test01.identity.test.aws.groupapi.cba/workforce-privileged-access-management/pam/request/452/<function '
-E         ?                                                                                                                 -----------
-E         +     'url': 'https://test01.identity.test.aws.groupapi.cba/workforce-privileged-access-management/pam/request/452',
-E         ?                                                                                                                  +
-E         -     'request_id at 0x106e6c400>',
+E               'url': 'https://test01.identity.test.aws.groupapi.cba/workforce-privileged-access-management/pam/request/452',
 E           }
 
 test/unit_tests/cyberark_onboarding/test_get_cyberark_onboarding_result.py:37: AssertionError
