@@ -1,9 +1,65 @@
+./test/group_provisioner_test.py::test_create_groups Failed: [undefined]AssertionError: assert 3 == 2
+
+ +  where 3 = <MagicMock name='add_entry' id='4362013872'>.call_count
+
+ +  and   2 = len(['Admin', 'User'])
+
+mock_add_entry = <MagicMock name='add_entry' id='4362013872'>
+
+mock_get_ws_shortname = <MagicMock name='get_ws_shortname' id='4362017616'>
+
+group_request = <ad_provisioner_api.adprovisioner.group_provisioner.GroupRequest object at 0x103fd9130>
+
+    @patch("ad_provisioner_api.adprovisioner.utils.get_ws_shortname")
+
+    @patch("ad_provisioner_api.adprovisioner.utils.add_entry")
+
+    def test_create_groups(mock_add_entry, mock_get_ws_shortname, group_request):
+
+        connection = MagicMock(spec=Connection)
+
+        mock_get_ws_shortname.return_value = "TESTWS"
+
+        mock_add_entry.return_value = True
+
+    
+
+        # Test with LOCAL_GROUP type
+
+        group_request.create_groups(
+
+            connection,
+
+            workspace_name,
+
+            ou_container_dn,
+
+            group_object_class,
+
+            roles,
+
+            WORKSPACES,
+
+            LOCAL_GROUP,
+
+            attributes,
+
+            sailpoint_enabled=sailpoint_enabled,
+
+            all_groups_dn=all_groups_dn
+
+        )
+
+    
+
+        mock_add_entry.assert_called()
+
 >       assert mock_add_entry.call_count == len(roles)
 
 E       AssertionError: assert 3 == 2
 
-E        +  where 3 = <MagicMock name='add_entry' id='4568923552'>.call_count
+E        +  where 3 = <MagicMock name='add_entry' id='4362013872'>.call_count
 
 E        +  and   2 = len(['Admin', 'User'])
 
-test/group_provisioner_test.py:102: AssertionError
+test/group_provisioner_test.py:64: AssertionError
