@@ -54,3 +54,16 @@
       ]
     }
   }
+
+
+
+    - name: Set AWS Role ARNs
+      run: |
+        aws_trust_role=$(echo "${{ secrets.AWS_TRUST_ROLE }}" | sed "s/\${aws_account}/${{ matrix.aws_account }}/g")
+        aws_deploy_role=$(echo "${{ secrets.AWS_DEPLOY_ROLE }}" | sed "s/\${aws_account}/${{ matrix.aws_account }}/g")
+        echo "AWS_TRUST_ROLE=$aws_trust_role" >> $GITHUB_ENV
+        echo "AWS_DEPLOY_ROLE=$aws_deploy_role" >> $GITHUB_ENV
+
+
+arn:aws:iam::${1111111111111}:role/Role
+arn:aws:iam::${1111111111111}:role/Role
