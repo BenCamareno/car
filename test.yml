@@ -1,0 +1,55 @@
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  update-trust-policy:
+    runs-on: default
+    environment: main
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: AWS Login and Assume Role
+      uses: General/aws-identity-tools/.github/actions/aws-login@main
+      with:
+        aws_trust_role: ${{ secrets.AWS_TRUST_ROLE }}
+        aws_deploy_role: ${{ secrets.AWS_DEPLOY_ROLE }}
+        role_session_name: gha-aws-session
+        aws_region: ap-southeast-2
+
+    - name: Get current trust policy
+      id: get-trust-policy
+      run: |
+        aws iam get-role --role-name ctRole --query 'Role.AssumeRolePolicyDocument' > trust-policy.json
+        cat trust-policy.json
+
+    - name: Read new entries from config file
+      id: read-new-entries
+      run: |
+        preview_entries=$(jq -r '.gh_repos.preview[]' config/trusted-repos.json)
+        nonprod_entries=$(jq -r '.gh_repos.nonprod[]' config/trusted-repos.json)
+        prod_entries=$(jq -r '.gh_repos.prod[]' config/trusted-repos.json)
+        echo "::set-output name=preview_entries::$preview_entries"
+        echo "::set-output name=nonprod_entries::$nonprod_entries"
+        echo "::set-output name=prod_entries::$prod_entries"
+
+    - name: Update trust policy
+      id: update-trust-policy
+      run: |
+        jq --argjson preview_entries "${{ steps.read-new-entries.outputs.preview_entries }}" \
+           --argjson nonprod_entries "${{ steps.read-new-entries.outputs.nonprod_entries }}" \
+           --argjson prod_entries "${{ steps.read-new-entries.outputs.prod_entries }}" \
+           '.Statement[0].Condition.StringLike["token.actions.githubusercontent.com:sub"] += $preview_entries + $nonprod_entries + $prod_entries' \
+           trust-policy.json > updated-trust-policy.json
+        cat updated-trust-policy.json
+
+    - name: Apply updated trust policy
+      run: |
+        aws iam update-assume-role-policy --role-name ctRole --policy-document file://updated-trust-policy.json
