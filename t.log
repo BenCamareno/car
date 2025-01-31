@@ -1,0 +1,47 @@
+        matrix="{\"include\":[]}"
+        IFS=',' read -ra envs <<< "${{ env.environments }}"
+        for env in "${envs[@]}"; do
+          accounts=$(jq -r ".aws_accounts[\"$env\"][]" config/trusted-repos.json)
+          for account in $accounts; do
+            if [ -n "$account" ]; then
+              matrix=$(echo $matrix | jq --arg env "$env" --arg account "$account" '.include += [{"environment": $env, "aws_account": $account}]')
+            fi
+          done
+        done
+        echo "Matrix: $matrix"
+        echo "matrix=$matrix" >> $GITHUB_OUTPUT
+
+
+{
+    "aws_accounts": {
+      "preview": [
+        "11111111111"
+      ],
+      "nonprod": [
+        "11111111111"
+      ],
+      "prod": [
+        "11111111111"
+      ]
+    },
+    "gh_repos": {
+      "preview": [
+        "repo:General/aws-jumphosts-cbainet-workloads:environment:preview",
+        "repo:General/aws-jumphosts-cbainet-workloads:environment:ARAM-817",
+        "repo:General/cba-organisation-stacksets:environment:ARAM-1180",
+        "repo:General/cba-organisation-stacksets:environment:main"
+      ],
+      "nonprod": [
+        "repo:General/aws-jumphosts-cbainet-workloads:environment:preview",
+        "repo:General/aws-jumphosts-cbainet-workloads:environment:ARAM-817",
+        "repo:General/cba-organisation-stacksets:environment:ARAM-1180",
+        "repo:General/cba-organisation-stacksets:environment:main"
+      ],
+      "prod": [
+        "repo:General/aws-jumphosts-cbainet-workloads:environment:preview",
+        "repo:General/aws-jumphosts-cbainet-workloads:environment:ARAM-817",
+        "repo:General/cba-organisation-stacksets:environment:ARAM-1180",
+        "repo:General/cba-organisation-stacksets:environment:main"
+      ]
+    }
+  }
