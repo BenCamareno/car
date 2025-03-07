@@ -1,0 +1,91 @@
+name: Deploy CloudFormation Stacks
+
+on:
+  push:
+    tags:
+      - ga-nonp
+      - ga-clab
+      - preview-nonp
+      - preview-clab
+
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to deploy'
+        required: true
+        default: 'ga-prod'
+        type: choice
+        options:
+          - ga-prod
+          - ga-nonp
+
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: default
+    environment: prod
+
+    env:
+      TEMPLATE_FILE: ${{ vars.TEMPLATE_FILE }}
+      CONFIG_FILE: ${{ vars.CONFIG_FILE }}
+      ENVIRONMENT_TYPE: ${{ 
+        github.event_name == 'workflow_dispatch' && github.event.inputs.tag ||
+        github.event_name == 'push' && github.ref_name ||
+        github.event_name == 'pull_request_review' && 'preview-clab' }}
+
+    steps:
+      - name: Checkout repository
+        if: github.event_name != 'pull_request_review'
+        uses: actions/checkout@v3
+
+      - name: Checkout PR branch
+        if: github.event_name == 'pull_request_review'
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -i https://artifactory.internal.cba/api/pypi/org.python.pypi/simple/ --upgrade pip pipenv
+          pip install -i https://artifactory.internal.cba/api/pypi/org.python.pypi/simple/ --upgrade awscli aws-sam-cli
+          echo ${{ github.event.repository.name }} > .venv && pipenv sync -d
+
+      - name: Run pre-build checks
+        run: |
+          pipenv run black --check . --include '\.py$'
+          pipenv run flake8 .
+
+      - name: AWS Login and Assume Role
+        id: assume-role
+        uses: CBA-General/aws-identity-tools/.github/actions/aws-login@main
+        with:
+          aws_trust_role: ${{ secrets.AWS_TRUST_ROLE }}
+          aws_deploy_role: ${{ secrets.AWS_DEPLOY_ROLE }}
+          role_session_name: cns-cba-org-stackset-assume-role
+          aws_region: ap-southeast-2
+
+      - name: Print environment variables
+        run: |
+          echo "TEMPLATE_FILE=${TEMPLATE_FILE}"
+          echo "CONFIG_FILE=${CONFIG_FILE}"
+          echo "ENVIRONMENT_TYPE=${ENVIRONMENT_TYPE}"
+
+      - name: Deploy with SAM
+        run: |
+          sam deploy \
+            --no-fail-on-empty-changeset \
+            --config-file ${{ env.CONFIG_FILE }} \
+            --config-env ${{ env.ENVIRONMENT_TYPE }} \
+            --template-file ${{ env.TEMPLATE_FILE }}
